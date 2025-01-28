@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  data:
+    image: mariadb
+    container_name: data
+    environment:
+      MARIADB_RANDOM_ROOT_PASSWORD: yes
+      MARIADB_DATABASE: testdb
+      MARIADB_USER: root
+      MARIADB_PASSWORD: example
+    volumes:
+      - ./sql:/docker-entrypoint-initdb.d
+    networks:
+      - tp3-network
+
+  script:
+    build:
+      context: ../etape2
+      dockerfile: Dockerfile
+    container_name: script
+    volumes:
+      - ./src:/app
+    networks:
+      - tp3-network
+
+  http:
+    image: nginx
+    container_name: http
+    ports:
+      - 8080:8080
+    volumes:
+      - ./src:/app
+      - ../etape1/config/default.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - tp3-network
+
+networks:
+  tp3-network:
